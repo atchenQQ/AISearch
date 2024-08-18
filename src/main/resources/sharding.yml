@@ -1,0 +1,43 @@
+# 配置数据源
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3303/aisearch?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  ds_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3303/aisearch2?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+# 配置分片策略
+rules:
+  - !SHARDING
+    tables: # 数据分片规则配置
+      answer:
+        actualDataNodes: ds_$->{0..1}.answer
+        databaseStrategy:
+          standard: # 标准分片
+            shardingColumn: uid # 分片列名称
+            shardingAlgorithmName: alg_mod # 分片算法名称
+        keyGenerateStrategy: # 分片键生成策略配置
+          column: aid
+          keyGeneratorName: snowflake
+      discuss:
+        actualDataNodes: ds_0.discuss
+      comment:
+        actualDataNodes: ds_0.comment
+      discuss_support:
+        actualDataNodes: ds_0.discuss_support
+      user:
+        actualDataNodes: ds_0.user
+    shardingAlgorithms: # 分片算法配置
+      alg_mod:
+        type: INLINE # 分片算法类型
+        props: # 分片算法属性配置
+          algorithm-expression: ds_$->{uid % 2}
+    keyGenerators: # 分片键生成器配置
+      snowflake:
+        type: SNOWFLAKE # 分布式序列算法类型

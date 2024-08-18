@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>AI Search</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=gedge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="pragrma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="expires" content="0" />
+    <link href="./layui/css/layui.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="layui-layout layui-layout-admin">
+        <!-- 顶部菜单 -->
+        <div class="layui-header">
+            <div class="layui-logo layui-hide-xs layui-bg-black">AI Search</div>
+            <!-- 头部区域（可配合layui 已有的水平导航） -->
+            <!-- chat -->
+            <ul id="chat-nav" class="layui-nav layui-layout-left ">
+                <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </li>
+                <li class="layui-nav-item layui-hide-xs layui-this" lay-on="nav-change-content" lay-data="chat-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content" lay-data="chat-tongyi-content"><a href="javascript:;">通义千问</a></li>
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content" lay-data="chat-xunfei-content"><a href="javascript:;">讯飞星火</a></li>
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content" lay-data="chat-wenxin-content"><a href="javascript:;">文心一言</a></li>
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                    lay-data="chat-doubao-content"><a href="javascript:;">豆包</a></li>
+            </ul>
+
+            <!-- draw -->
+            <ul id="draw-nav" class="layui-nav layui-layout-left " style="display: none;">
+                <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </li>
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                    lay-data="draw-tongyi-content"><a href="javascript:;">通义千问</a></li>
+                <li style="display: none;" class="layui-nav-item layui-hide-xs" lay-on="nav-change-content"
+                    lay-data="draw-chatgpt-content"><a href="javascript:;">ChatGPT</a></li>
+
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content" lay-data="draw-xunfei-content"><a href="javascript:;">讯飞星火</a></li>
+                <li class="layui-nav-item layui-hide-xs" lay-on="nav-change-content" lay-data="draw-wenxin-content"><a href="javascript:;">文心一言</a></li>
+            </ul>
+
+            <!-- 讨论选项卡 -->
+            <ul id="discuss-nav" class="layui-nav layui-layout-left" style="display: none;">
+                <!-- 移动端显示 -->
+                <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </li>
+                <li class="layui-nav-item layui-hide-xs" lay-data="discuss-content" lay-on="nav-change-content"><a href="javascript:;">推荐</a></li>
+                <li class="layui-nav-item layui-hide-xs" lay-data="discuss-content-new" lay-on="nav-change-content"><a href="javascript:;">最新</a></li>
+            </ul>
+
+            <ul id="add-discuss-nav" class="layui-nav layui-layout-left" style="display: none;">
+                <!-- 移动端显示 -->
+                <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </li>
+            </ul>
+
+
+            <ul class="layui-nav layui-layout-right">
+
+                    <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                        <div id="li_logout_div">
+                        <a href="javascript:;">
+                            <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+                          <span id="username_span">  tester</span>
+                        </a>
+                        <dl class="layui-nav-child" style="display: none;">
+                            <dd><a href="javascript:;">设置</a></dd>
+                            <dd lay-on="logout"> <a href="javascript:;">退出登录</a></dd>
+                        </dl>
+                     </div>
+                    </li>
+
+                <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                    <a href="javascript:;">
+                        <i class="layui-icon layui-icon-more-vertical"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- 侧边导航 -->
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="" href="javascript:;">AI工具箱</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" lay-on="chat-nav-show" class="layui-this">对话</a></dd>
+                            <dd><a href="javascript:;" lay-on="draw-nav-show">绘图</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item" >
+                        <a href="javascript:;">话题讨论</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" lay-on="discuss-nav-show" >话题列表</a></dd>
+                            <dd><a href="javascript:;" lay-on="show-my-discuss-list">我的话题</a></dd>
+                            <dd><a href="javascript:;"lay-on="add-discuss">发表话题</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item"><a lay-on="about-us" href="javascript:;">关于</a></li>
+                </ul>
+                <div id="unlogin_btn_div">
+                    <button type="button" class="layui-btn layui-btn-lg" style="position: absolute; bottom: 20px; left: 50px;" lay-on="doLogin">未登录</button>
+                </div>
+            </div>
+        </div>
+        <!-- 内容主体区域 -->
+        <div class="layui-body">
+            <div style="padding: 15px; margin-bottom: 50px">
+                <!-- 内容主体区域 -->
+                <div id="chat-chatgpt-content" ></div>
+                <div id="chat-tongyi-content"  style="display: none;">
+                </div>
+                <div id="chat-xunfei-content"  style="display: none;">
+                </div>
+                <div id="chat-wenxin-content" class="layui-card layui-panel" style="display: none;">
+                </div>
+                <div id="chat-doubao-content" class="layui-card layui-panel" style="display: none;">
+                </div>
+
+                <!-- draw内容主体区域 -->
+                <div id="draw-chatgpt-content"  style="display: none;"></div>
+                <div id="draw-tongyi-content" class="layui-card layui-panel" style="display: none;">
+                </div>
+                <div id="draw-xunfei-content" class="layui-card layui-panel" style="display: none;">
+
+                </div>
+                <div id="draw-wenxin-content" class="layui-card layui-panel" style="display: none;">
+                </div>
+
+
+                <!-- discuss 话题列表 -->
+                <div id="discuss-content"  style="display: none;">
+
+                    <div id="discuss-list-support">                               <!-- 讨论列表 -->
+
+                    </div>
+                    <div id="discuss-laypage-normal"></div>   <!-- 分页组件 -->
+
+                </div>
+                <!-- 最新话题 -->
+                <div id="discuss-content-new"  style="display: none;">
+                    <div id="discuss-list-did">                               <!-- 讨论列表 -->
+
+                    </div>
+                    <div id="discuss-laypage2-normal"></div>   <!-- 分页组件 -->
+                </div>
+
+                <!-- 发表话题-->
+                <div id="add-discuss-content"  style="display: none;">
+                    <div class="layui-input-group" style="width: 80%; margin-top: 26px;">
+                        <div class="layui-input-prefix" style="width: 200px; ">标题</div>
+                        <input id="disscuss-title-input" type="text" class="layui-input">
+                    </div>
+                    <div class="layui-input-group" style="width: 80%; margin-top: 26px;">
+                        <div class="layui-input-prefix" style="width: 200px;">正文</div>
+                        <textarea id="disscuss-content-input" name="" placeholder="多行文本框" class="layui-textarea"></textarea>
+                    </div>
+                    <div style="margin-top: 26px; text-align: center;">
+                        <button lay-on="doAddDiscuss" type="button" class="layui-btn layui-btn-lg" style="width: 200px;">添加</button>
+                    </div>
+                </div>
+                <!-- 我的话题 -->
+                <div id="my-discuss-content"  style="display: none;">
+                    <div class="layui-bg-gray" style="padding: 16px;">
+                        <div id="my-discuss-list" class="layui-row layui-col-space15">
+
+                        </div>
+                   </div>
+                </div>
+                <!-- 话题详情 -->
+                <div id="discuss-detail-div" style="padding-bottom: 100px; padding-left: 40px; display: none; background-color: #f9f9fa;">
+
+
+
+                </div>
+            </div>
+        </div>
+        <!-- 底部固定区域 -->
+        <div id="footer-chat" class="layui-footer " style="height: 80px; line-height: 80px;">
+            <div class="layui-form-item" style="width: 800px;">
+                <div class="layui-input-group" style="margin-left: 50px; width: 100%;">
+                    <input type="text" placeholder="请输入问题:" class="layui-input" style="margin-top: 20px;" id="question-input">
+                    <div class="layui-input-suffix">
+                        <button id="question-send-btn" type="button" class="layui-btn" lay-on="question-send">发送按钮</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./layui/layui.js"></script>
+    <script src="./js/ajaxutil.js"></script>
+    <script src="./js/appvariable.js"></script>
+    <script src="./js/marked.min.js"></script>
+    <script>
+        //JS
+        layui.use(['element', 'layer', 'util', 'jquery'], function() {
+            var element = layui.element;
+            var layer = layui.layer;
+            var util = layui.util;
+            var $ = layui.$;
+            var jquery = layui.jquery;
+            var laypage = layui.laypage; // 分页组件声明
+            var question_type = "chat"; // 默认chat聊天功能
+            var is_first_load_draw_chatgpt = true; // 是否首次加载chatgpt功能
+            var is_first_load_draw_tongyi = true; // 是否首次加载tongyi功能
+            var is_first_load_draw_xunfei = true; // 是否首次加载xunfei功能
+            var is_first_load_draw_wenxin = true; // 是否首次加载wenxin功能
+            var chat_succ_maxcount = 5;// 聊天成功次数
+            var draw_succ_maxcount = 3;// 聊天成功次数
+            var support = true; // 点赞状态
+
+
+            // 判断是否登录
+            function isLogin() {
+                if(layui.data(login_user_info_key).authrization){
+                    // 登录状态
+                    jquery("#unlogin_btn_div").hide();
+                    jquery("#li_logout_div").show()
+                    jquery("#username_span").html(layui.data(login_user_info_key).username)
+                    jquery("#question-input").removeAttr("disabled")
+                    jquery("#question-send-btn").removeAttr("disabled")
+                }else {
+                    // 未登录状态
+                    jquery("#unlogin_btn_div").show();
+                    jquery("#li_logout_div").hide()
+                    jquery("#question-input").attr("disabled","disabled")
+                    jquery("#question-send-btn").attr("disabled","disabled")
+                }
+            }
+            // 封装页面问答HTML代码
+            function showQestionAnswerHtml(question, answer) {
+                return '<div class="layui-card layui-panel">' +
+                    '                    <div class="layui-card-header layui-font-16">\n' +
+                    '                        问题:&nbsp;' + question + '\n' +
+                    '                    </div>\n' +
+                    '                    <div class="layui-card-body">\n' +
+                    '                        答案:&nbsp;' + marked.parse(answer)+ '\n' +
+                    '                    </div>'+
+                    '                </div>'
+            }
+            function showDrawHtml(question, answer) {
+                return '<div class="layui-card layui-panel">' +
+                    '                    <div class="layui-card-header layui-font-16">\n' +
+                    '                        问题:&nbsp;' + question + '\n' +
+                    '                    </div>\n' +
+                    '                    <div class="layui-card-body">\n' +
+                    '                       <img src="' +answer+ '">' +
+                    '                    </div>'+
+                    '  </div>'
+            }
+
+
+            //封装基础聊天组件和展示方法
+            baseChatShowList = function(showDiv,res) {
+                if (res.code == '200'){
+                    var html = "";
+                    for (var i = 0; i < res.data.length; i++) {
+                        html += showQestionAnswerHtml(res.data[i].title, res.data[i].content);
+                    }
+                    html += '<div style="height: 50px;"></div>';
+                    jquery("#"+showDiv).html(html);
+                }
+            }
+
+            // 显示openai对话历史问答信息 方法
+            showOpenaiChatHistory = function() {
+                // 回调显示方法
+                function doshowList(res) {
+                   baseChatShowList("chat-chatgpt-content",res);
+                }
+                authAjax(jquery, "/openai/getchatlist", {}, doshowList);
+            }
+
+            // 显示tongyi历史对话信息 方法
+            showTongyiChatHistory = function() {
+                // 回调显示方法
+                function doshowList(res) {
+                    baseChatShowList("chat-tongyi-content",res);
+                }
+                authAjax(jquery, "/tongyi/getchatlist", {}, doshowList);
+            }
+
+            // 显示xunfei历史对话信息 方法
+            showXunfeiChatHistory = function() {
+                // 回调显示方法
+                function doshowList(res) {
+                    baseChatShowList("chat-xunfei-content",res);
+                }
+                authAjax(jquery, "/xunfei/getchatlist", {}, doshowList);
+            }
+            // 显示qianfan历史对话信息 方法
+            showQianfanChatHistory = function() {
+                // 回调显示方法
+                function doshowList(res) {
+                    baseChatShowList("chat-wenxin-content",res);
+                }
+                authAjax(jquery, "/qianfan/getchatlist", {}, doshowList);
+            }
+            // 显示doubao历史对话信息 方法
+            showDoubaoChatHistory = function() {
+                // 回调显示方法
+                function doshowList(res) {
+                    baseChatShowList("chat-doubao-content",res);
+                }
+                authAjax(jquery, "/doubao/getchatlist", {}, doshowList);
+            }
+
+            // 显示历史绘画信息公共方法
+            baseDrawShowList = function(showDiv,res) {
+                if (res.code == '200'){
+                    var html = "";
+                    for (var i = 0; i < res.data.length; i++) {
+                        html += showDrawHtml(res.data[i].title, res.data[i].content);
+                    }
+                    html += '<div style="height: 50px;"></div>';
+                    jquery("#"+showDiv).html(html);
+                }
+            }
+            // 显示openai绘画历史信息 方法
+            showOpenaiDrawHistory = function() {
+                if (is_first_load_draw_chatgpt){
+                // 回调显示方法
+                function doshowList(res) {
+                    baseDrawShowList("draw-chatgpt-content",res);
+                }
+                authAjax(jquery, "/openai/getdrawlist", {}, doshowList);
+                is_first_load_draw_chatgpt = false;
+              }
+            }
+            // 显示tongyi绘画历史信息 方法
+            showTongyiDrawHistory = function() {
+                 // 回调显示方法
+                if (is_first_load_draw_tongyi){
+                    function doshowList(res) {
+                        baseDrawShowList("draw-tongyi-content",res);
+                    }
+                    authAjax(jquery, "/tongyi/getdrawlist", {}, doshowList);
+                    is_first_load_draw_tongyi = false;
+                }
+            }
+            // 显示xunfei绘画历史信息 方法
+            showXunfeiDrawHistory = function() {
+                if (is_first_load_draw_xunfei){
+                    function doshowList(res) {
+                        baseDrawShowList("draw-xunfei-content",res);
+                    }
+                    authAjax(jquery, "/xunfei/getdrawlist", {}, doshowList);
+                    is_first_load_draw_xunfei = false;
+                }
+            }
+            // 显示qianfan绘画历史信息 方法
+            showQianfanDrawHistory = function() {
+                if (is_first_load_draw_wenxin){
+                    function doshowList(res) {
+                        baseDrawShowList("draw-wenxin-content",res);
+                    }
+                    authAjax(jquery, "/qianfan/getdrawlist", {}, doshowList);
+                    is_first_load_draw_wenxin = false;
+                }
+            }
+
+
+
+
+            // 聊天公共回调方法
+            baseCallback = function(showDiv,question,res) {
+                //显示回答
+                if (res.code == '200') {
+                    jquery("#"+showDiv).prepend(showQestionAnswerHtml(question, res.data));
+                    // jquery("#question-input").val("");
+                    var model="";
+                    if (showDiv == "chat-chatgpt-content") {
+                        model = "ChatGPT";
+                    } else if (showDiv == "chat-tongyi-content") {
+                        model = "通义千问";
+                    } else if (showDiv == "chat-xunfei-content") {
+                        model = "讯飞星火";
+                    } else if (showDiv == "chat-wenxin-content") {
+                        model = "文心一言";
+                    } else if (showDiv == "chat-doubao-content") {
+                        model = "豆包";
+                    }
+                    layer.msg(model + "：生成成功！");
+                    chat_succ_maxcount--;
+                } else {
+                    chat_succ_maxcount--;
+                    layer.msg("请求失败！"+res.message);
+                }
+                if (chat_succ_maxcount == 0) { // 所有大模型生成完成
+                    jquery("#question-input").val("");
+                    jquery("#question-send-btn").html("发送");
+                    jquery("#question-send-btn").removeAttr("disabled");
+                    chat_succ_maxcount = 5;
+                }
+            }
+
+            // 调用openai聊天
+            doOpenaiChat = function(question) {
+                function callback(res) {
+                   baseCallback("chat-chatgpt-content",question,res);
+                }
+                authAjax(jquery, "/openai/chat",{
+                    question: question
+                },callback)
+            }
+
+            // 调用tongyi聊天功能
+            doTongyiChat = function(question) {
+                function callback(res) {
+                    baseCallback("chat-tongyi-content",question,res);
+                }
+                authAjax(jquery, "/tongyi/chat", {
+                    question: question
+                }, callback)
+            }
+
+            // 调用xunfei聊天功能
+            doXunfeiChat = function(question) {
+                function callback(res) {
+                    baseCallback("chat-xunfei-content",question,res);
+                }
+                authAjax(jquery, "/xunfei/chat", {
+                    question: question
+                }, callback)
+            }
+
+            // 调用qianfan聊天功能
+            doQianfanChat = function(question) {
+                function callback(res) {
+                    baseCallback("chat-wenxin-content",question,res);
+                }
+                authAjax(jquery, "/qianfan/chat", {
+                    question: question
+                }, callback)
+            }
+            // 调用doubao聊天功能
+            doDoubaoChat = function(question) {
+                function callback(res) {
+                    baseCallback("chat-doubao-content",question,res);
+                }
+                authAjax(jquery, "/doubao/chat", {
+                    question: question
+                }, callback)
+            }
+
+
+            // 封装绘图的公共回调方法
+            baseDrawCallback = function(showDiv,question,res) {
+                if (res.code=='200'){
+                    jquery("#"+showDiv).prepend(showDrawHtml(question,res.data));
+                   // jquery("#question-input").val("");
+                    var model = "";
+                    if (showDiv == "draw-chatgpt-content") {
+                        model = "ChatGPT";
+                    } else
+                    if (showDiv == "draw-tongyi-content") {
+                        model = "通义千问";
+                    } else if (showDiv == "draw-xunfei-content") {
+                        model = "讯飞星火";
+                    } else if (showDiv == "draw-wenxin-content") {
+                        model = "文心一言";
+                    } else if (showDiv == "draw-doubao-content") {
+                        model = "豆包";
+                    }
+                    layer.msg(model + "：生成成功！");
+                    draw_succ_maxcount--;
+                }else {
+                    draw_succ_maxcount--;
+                    layer.msg("请求失败！"+res.message);
+                }
+                if (draw_succ_maxcount == 0) { // 所有大模型生成完成
+                    jquery("#question-input").val("");
+                    jquery("#question-send-btn").html("发送");
+                    jquery("#question-send-btn").removeAttr("disabled");
+                    draw_succ_maxcount = 3;
+                }
+            }
+           // 调用openai绘画功能
+            doOpenaiDraw = function(question) {
+                function callback(res) {
+                    // 显示图片
+                    baseDrawCallback("draw-chatgpt-content",question,res);
+                }
+                authAjax(jquery, "/openai/draw",{ question: question},callback)
+            }
+            // 调用tongyi绘画功能
+            doTongyiDraw = function(question) {
+                function callback(res) {
+                    // 显示图片
+                    baseDrawCallback("draw-tongyi-content",question,res);
+                }
+                authAjax(jquery, "/tongyi/draw",{ question: question},callback)
+            }
+            // 调用xunfei绘画功能
+            doXunfeiDraw = function(question) {
+                function callback(res) {
+                    // 显示图片
+                    baseDrawCallback("draw-xunfei-content",question,res);
+                }
+                authAjax(jquery, "/xunfei/draw",{ question: question},callback)
+            }
+            // 调用qianfan绘画功能
+            doQianfanDraw = function(question) {
+                function callback(res) {
+                    // 显示图片
+                    baseDrawCallback("draw-wenxin-content",question,res);
+                }
+                authAjax(jquery, "/qianfan/draw",{ question: question},callback)
+            }
+
+            // 话题列表展示公共方法
+            doDisscussList = function(type,showDiv,pageDiv) {
+                function  callback(res) {
+                    if (res.code == '200') {
+                        var createHtml = "";
+                        if (res.data.records.length > 0){
+                            for (var i = 0; i < res.data.records.length; i++) {
+                                let discuss = res.data.records[i];
+                                createHtml+='<div title="点击进入详情" style="cursor: pointer;" class="layui-card layui-panel">\n' +
+                                    '                            <div lay-on="doShowDiscuss" lay-data="' + discuss.did + '" class="layui-card-header layui-font-16">\n' +
+                                    discuss.title +  '  \n' +
+                                    '                            </div>\n' +
+                                    '                            <div class="layui-card-body">\n' +
+                                    discuss.content +'  \n' +
+                                    '                            </div>\n' +
+                                    '                        </div>'
+                            }
+                        }else {
+                            createHtml+='<h3>暂无推荐</h3>'
+                        }
+                        jquery("#"+showDiv).html(createHtml);
+                        // 绘制分页列表
+                        laypage.render({
+                            elem: pageDiv,
+                            count: res.data.total, // 数据总数
+                            limit: 10, // 每页显示的条数
+                            curr: res.data.current, // 当前页
+                            jump: function(obj, first){
+                                // 首次不执行
+                                if(!first){
+                                    let page = obj.curr;// 得到当前页，以便向服务端请求对应页的数据。
+                                    authAjax(jquery, "/discuss/list", {
+                                        page: page,type:type
+                                    }, callback)
+                                }
+                            }
+                        });  // 绘制分页列表
+                    }
+                } //callback
+                authAjax(jquery, "/discuss/list", {
+                    page: 1,type:type
+                }, callback)
+
+            }
+
+
+
+            // 页面加载完成后，执行的初始化操作
+            layer.ready(function() {
+                 // 登录状态判断
+                isLogin();
+                //openai 显示对话历史问答信息   懒加载模式（对话和绘图） 对话饿汉模式
+                showOpenaiChatHistory();
+                //显示通义历史对话信息
+                showTongyiChatHistory();
+                //显示xunfei历史对话信息
+                showXunfeiChatHistory();
+                //显示qianfan历史对话信息
+                showQianfanChatHistory();
+                //显示doubao历史对话信息
+                showDoubaoChatHistory();
+            });
+            util.on('lay-on', {
+                'discuss-nav-show': function() {
+                    jquery("#chat-nav").hide();
+                    jquery("#draw-nav").hide();
+                    jquery("#discuss-nav").show();
+                    //标签页重置第一个
+                    var showId = jquery("#discuss-nav").find("li").eq(1).attr("lay-data")
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+                    jquery("#discuss-nav").find("li").removeClass("layui-this");
+                    jquery("#discuss-nav").find("li").eq(1).addClass("layui-this");
+                    // 隐藏底部信息
+                    jquery("#footer-chat").hide();
+                    // 查询推荐列表
+                    doDisscussList(1,"discuss-list-support","discuss-laypage-normal");
+
+                },   // discuss-nav-show
+
+                'draw-nav-show': function() {
+                    // 显示底部信息
+                    jquery("#footer-chat").show();
+                    question_type = "draw"; // 切换绘画功能
+                    jquery("#chat-nav").hide();
+                    jquery("#discuss-nav").hide();
+                    jquery("#draw-nav").show();
+                    // 标签页重置第一个
+                    var showId = jquery("#draw-nav").find("li").eq(1).attr("lay-data")
+                    jquery("#draw-nav").find("li").removeClass("layui-this");
+                    jquery("#draw-nav").find("li").eq(1).addClass("layui-this");
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+
+                    // 显示历史绘图信息
+                    // 显示openai绘画历史信息
+                    //showOpenaiDrawHistory();
+                    // 显示tongyi绘画历史信息
+                    showTongyiDrawHistory();
+                    // 显示xunfei绘画历史信息
+                    showXunfeiDrawHistory();
+                    // 显示qianfan绘画历史信息
+                    showQianfanDrawHistory();
+                },
+
+                'chat-nav-show': function() {
+                    jquery("#draw-nav").hide();
+                    jquery("#discuss-nav").hide();
+                    jquery("#chat-nav").show();
+                    // 标签页重置第一个
+                    var showId = jquery("#chat-nav").find("li").eq(1).attr("lay-data")
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+                    jquery("#chat-nav").find("li").removeClass("layui-this");
+                    jquery("#chat-nav").find("li").eq(1).addClass("layui-this");
+                    jquery("#footer-chat").show();
+                    question_type = "chat";
+                },
+                // 标签页切换
+                'nav-change-content': function(e) {
+                    //根据标签页切换不同菜单
+                    var showId = jquery(e).attr('lay-data');
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+                    if (showId == "discuss-content-new"){
+                        // 请求最新的话题列表进行展示
+                        doDisscussList(2,"discuss-list-did","discuss-laypage2-normal");
+                    }
+                },
+                // 发送问题
+                'question-send': function() {
+                    var question = jquery("#question-input").val();
+                    if (question == null || question == "") {
+                        layer.msg("请先输入问题!");
+                        return;
+                    }
+                    jquery("#question-send-btn").attr("disabled", "disabled");
+                    jquery("#question-send-btn").html("生成中...")
+                    if (question_type == "chat") { //聊天功能
+                        doOpenaiChat(question);   //调用openai聊天功能
+                        doTongyiChat(question);   //调用tongyi聊天功能
+                        doXunfeiChat(question);   //调用xunfei聊天功能
+                        doQianfanChat(question);   //调用qianfan聊天功能
+                        doDoubaoChat(question);   // 调用doubao聊天功能
+
+
+                    } else if (question_type == "draw") { //绘画功能
+
+                        // doOpenaiDraw(question);   //调用openai绘画功能
+                         doTongyiDraw(question);  //调用tongyi绘画功能
+                         doXunfeiDraw(question); //调用xunfei绘画功能
+                         doQianfanDraw(question); //调用qianfan绘画功能
+
+                    }
+                },
+                // 登录
+                'doLogin': function() {  //弹出登录框
+                    layer.open({
+                        type: 2,
+                        title: '登录',
+                        area: ['560px', '400px'],
+                        content: '/login.html',
+                        fixed: false, // 不固定
+                        maxmin: false,
+                        shadeClose: false,
+                        btnAlign: 'c',
+                        move:false
+                    });
+                },
+                // 退出登录
+                'logout': function() {
+                    layer.confirm('确定退出吗？', {
+                        btn: ['确定', '关闭'] ,//按钮
+                        title: '退出',
+                        move: false
+                    }, function(){
+                        // 退出登录
+                        layui.data(login_user_info_key, null);
+                        jquery("#username_span").text(" 未登录");
+                        layer.msg('退出成功', {
+                            icon: 1
+                        });
+                        isLogin();
+                    }, function(){
+                    });
+                },
+                // 点击添加话题按钮
+                'add-discuss': function() {
+                    jquery("#add-discuss-nav").show();
+                    // jquery("#discuss-nav").show();
+                    jquery("#discuss-nav").hide();
+                    jquery("#chat-nav").hide();
+                    jquery("#draw-nav").hide();
+
+                    //标签页重置第一个
+                    // var showId = jquery("#discuss-nav").find("li").eq(1).attr("lay-data")
+                    var showId = "add-discuss-content";
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+                    jquery("#discuss-nav").find("li").removeClass("layui-this");
+                    jquery("#discuss-nav").find("li").eq(1).addClass("layui-this");
+                    // 隐藏底部信息
+                    jquery("#footer-chat").hide();
+                },
+                // 添加话题
+                'doAddDiscuss': function() {
+                    // 1 非空校验
+                    var title = jquery("#disscuss-title-input").val();
+                    var content = jquery("#disscuss-content-input").val();
+                    if (title == null || title == "") {
+                        layer.msg("请填写话题标题!");
+                        title.focus();
+                        return;
+                    }
+                    if (content == null || content == "") {
+                        layer.msg("请填写话题内容!");
+                        content.focus();
+                        return;
+                    }
+                    // 2 调用后端接口
+                    function callback(res) {
+                        if (res.code == '200') {
+                            layer.msg("添加话题成功!");
+                            jquery("#discuss-title-input").val("");
+                            jquery("#discuss-content-input").val("");
+                        }
+                        else {
+                            layer.msg("添加话题失败!"+res.message);
+                        }
+                    }
+                    authAjax(jquery, "/discuss/add", {
+                        title: title,
+                        content: content
+                    }, callback)
+                },// doAddDiscuss
+                // 点击我的话题导航
+                'show-my-discuss-list': function() {
+                    jquery("#my-discuss-content").show();
+                    jquery("#add-discuss-nav").hide();
+                    jquery("#discuss-nav").hide();
+                    jquery("#chat-nav").hide();
+                    jquery("#draw-nav").hide();
+
+                    //标签页重置第一个
+                    var showId = "my-discuss-content";
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+                    jquery("#discuss-nav").find("li").removeClass("layui-this");
+                    jquery("#discuss-nav").find("li").eq(1).addClass("layui-this");
+                    // 隐藏底部信息
+                    jquery("#footer-chat").hide();
+                    // 显示我的话题列表
+                    function callback(res) {
+                        if (res.code == '200') {
+                            var discussList = res.data;
+                            var discussHtml = "";
+                            for (var i = 0; i < discussList.length; i++) {
+                                var discuss = discussList[i];
+                                discussHtml+='  <div class="layui-col-md6">\n' +
+                                    '                                <div class="layui-card">\n' +
+                                    '                                    <div class="layui-card-header">\n' +
+                                    '<a title="点击进入详情" style="cursor: pointer ;" lay-on="doShowDiscuss" lay-data="'+discuss.did+'">' +
+                                    discuss.title + '</a>                                        \n' +
+                                    '                                        <a lay-on="doDeleteDiscuss"\n' +
+                                    '                                           lay-data="'+
+                                    discuss.did+'" href="javascript:;" style="position: absolute; right: 20px;">删除</a>\n' +
+                                    '                                    </div>\n' +
+                                    '                                    <div class="layui-card-body">\n' +
+                                    discuss.content + '                                        \n' +
+                                    '                                    </div>\n' +
+                                    '                                </div>\n' +
+                                    '                            </div>';
+                            }
+                            jquery("#my-discuss-list").html(discussHtml);
+                        } else {
+                            layer.msg("请求失败！"+res.message);}
+                    }  //callback
+                    authAjax(jquery, "/discuss/mylist", {}, callback)
+                },
+                // 删除我的话题
+                'doDeleteDiscuss': function(data) {
+                    layer.confirm('确定删除吗？', {
+                        move: false,
+                        title: '删除',
+                        btn: ['确定', '关闭'] //按钮
+                    }, function(index){
+                       // 执行删除操作
+                        // attr  获取属性值
+                        var did = jquery(data).attr("lay-data");
+                        function callback(res) {
+                            if (res.code == '200') {
+                                layer.msg("删除成功!");
+                                jquery("#my-discuss-list").find("[lay-data='"+did+"']").parent().parent().parent().remove();
+                            }
+                            else {
+                                layer.msg("删除失败!"+res.message);
+                            }
+                        }
+                        authAjax(jquery, "/discuss/delete", {
+                            did: did
+                        }, callback);
+                        layer.close(index); // 关闭弹框
+                    }, function(){
+                    });
+                },
+                // 点击话题详情
+                'doShowDiscuss': function(obj) {
+                    jquery("#my-discuss-content").hide();
+                    jquery("#add-discuss-nav").hide();
+                    jquery("#discuss-nav").hide();
+                    jquery("#chat-nav").hide();
+                    jquery("#draw-nav").hide();
+
+                    //标签页重置第一个
+                    var showId = "discuss-detail-div";
+                    jquery("#" + showId).show();
+                    jquery("#" + showId).siblings().hide();
+                    jquery("#discuss-nav").find("li").removeClass("layui-this");
+                    jquery("#discuss-nav").find("li").eq(1).addClass("layui-this");
+                    // 隐藏底部信息
+                    jquery("#footer-chat").hide();
+                    // 获取lay-data did
+                    var did = jquery(obj).attr("lay-data");
+                    // 获取话题详情回调
+
+                    function callback(res) {
+                        if (res.code == '200') {
+                            var discuss = res.data.discuss;
+                            var commentList = res.data.commentlist;
+                            var html = '                    <h2>' + discuss.title + '</h2>\n' +
+                                '                    <div style="padding-top: 10px">\n' +
+                                '                        作者：<span>'+discuss.username+'</span>&nbsp;&nbsp;&nbsp;\n' +
+                                '                        发布于：<span>'+discuss.createtime+'</span>&nbsp;&nbsp;&nbsp;\n' +
+                                '                        阅读量：<span>'+discuss.readcount+'</span>&nbsp;&nbsp;&nbsp;\n' +
+                                '                        点赞数：<span id="discuss-support-count">'+discuss.supportcount+'</span>&nbsp;&nbsp;&nbsp;\n' +
+                                '                    </div>\n' +
+                                '                    <div style="padding-top:20px;">\n' +
+                                                                discuss.content +
+                                '                       \n' +
+                                '                    </div>\n' +
+                                '                    <div style="padding-top: 10px; height: 20px; width: 80%; position: relative;">\n' +
+                                '                        <i lay-on="doSupport" lay-data="'+discuss.did+'" class="layui-icon layui-icon-praise" style="font-size: 20px; color: #FFE11EFF; position: absolute; right: 0;bottom: 0; cursor: pointer;">点赞</i>\n' +
+                                '                    </div>\n' +
+                                '                    <hr>\n' +
+                                '                    <div>\n' +
+                                '                        <h3>发表评论</h3>\n' +
+                                '                        <div style="margin-top: 20px;">\n' +
+                                '                            <div class="layui-input-group">\n' +
+                                '                                <div style="width: 110px; color: #0000f5; font-size: 16px;  " class="layui-input-prefix">'+layui.data(login_user_info_key).username+':</div>\n' +
+                                '                               <textarea id="comment-content" style="width: 800px; height: 50px;border: 1px solid #0000f5;mgargin-left: 10px; " name="" placeholder="输入评论内容" class="layui-textarea"></textarea>\n' +
+                                '                            </div>\n' +
+                                '                           <div style="margin-top: 20px;margin-left: 110px">\n' +
+                                '                               <button lay-on="add-comment" lay-data="'+discuss.did+'" class="layui-btn layui-btn-primary layui-border-orange">发送</button>\n' +
+                                '                           </div>\n' +
+                                '                        </div>\n' +
+                                '                    </div>\n' +
+                                '                    <hr>\n' +
+                                '                    <div >\n' +
+                                '                        <h3 style="margin-bottom: 30px;">评论列表</h3>\n <div id="comment-list">';
+
+                            if ( commentList != null && commentList.length > 0){
+                                for (let i = 0; i < commentList.length; i++) {
+                                    let comment = commentList[i];
+                                    html+='   <div style="margin-bottom: 20px; border-right: 3px solid #eda597; border-radius: 5px; width: 80%;">\n' +
+                                        '     <b style="margin-right: 10px;">'+comment.username+":"+'</b>  '+comment.content+'\n' +
+                                        '    </div>';
+                                }
+                            }else {
+                               html+="<h4>暂无评论</h4>";
+                            }
+                            jquery("#"+showId).html(html+"</div></div>");
+                          }else {
+                            layer.msg("获取话题详情失败！"+res.message);
+                        }
+
+                    }
+                    authAjax(jquery, "/discuss/detail", {
+                        did: did
+                    }, callback)
+
+                },
+                // 添加评论
+                'add-comment': function(obj) {
+                    var did = jquery(obj).attr("lay-data");
+                    var content = jquery("#comment-content");
+                    if (content.val() == null || content.val() == "") {
+                        layer.msg("请填写评论内容!");
+                        content.focus();
+                        return;
+                    }
+                    authAjax(jquery, "/comment/add", {
+                        did: did,
+                        content: content.val()
+                    }, function (res) {
+                        if (res.code == '200') {
+                            layer.msg("评论成功!");
+                            var createhtml = '   <div style="margin-bottom: 30px;">\n' +
+                                '     <b>'+layui.data(login_user_info_key).username+'</b>: '+content.val()+'\n' +
+                                '    </div>';
+                            if (jquery("#comment-list").find("div").length == 0){
+                                jquery("#comment-list").html(createhtml);
+                            }else {
+                                jquery("#comment-list").prepend(createhtml);
+                            }
+                            content.val("");
+                        }
+                        else {
+                            layer.msg("评论失败!"+res.message);
+                        }
+                    })
+                },
+                // 点赞
+                'doSupport': function(obj) {
+                    var did  = jquery(obj).attr("lay-data");
+                    authAjax(jquery, "/discuss/support", {
+                        did: did
+                    }, function (res) {
+                        if (res.code == '200') {
+                            jquery("#discuss-support-count").html(parseInt(jquery("#discuss-support-count").html())+1);
+                            layer.msg("点赞成功!");
+                            // todo 取消点赞
+                        }
+                    });
+                }, // doSupport
+                // 关于我们
+                'about-us': function() {
+                    layer.open({
+                        type: 1,
+                        title: '关于我们',
+                        content: '<div style="padding: 15px;">此功能尚未开发<br><br><br>点击任意位置关闭</div>',
+                        area: ['260px', '100%'],
+                        offset: 'rt', // 右上角
+                        anim: 'fade', // 从右侧滑出
+                        shadeClose: true,
+                        scrollbar: false
+                    });
+                }
+            })
+
+            //头部事件
+            util.event('lay-header-event', {
+                menuLeft: function(othis) { // 左侧菜单事件
+                    layer.msg('展开左侧菜单的操作', {
+                        icon: 0
+                    });
+                },
+                menuRight: function() { // 右侧菜单事件
+                    layer.open({
+                        type: 1,
+                        title: '更多',
+                        content: '<div style="padding: 15px;">暂无更多详情<br><br><br>点击任意位置关闭</div>',
+                        area: ['260px', '100%'],
+                        offset: 'rt', // 右上角
+                        anim: 'slideLeft', // 从右侧抽屉滑出
+                        shadeClose: true,
+                        scrollbar: false
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

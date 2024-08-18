@@ -1,0 +1,29 @@
+server:
+  port: 8080
+spring:
+  ollama:
+    base-url: http://localhost:11434
+    chat:
+      options:
+        model: qwen2:0.5b
+  application:
+    name: aISearch
+  config:
+    import: nacos:aisearch-config
+  datasource:
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:sharding.yml
+
+  cloud:
+    nacos:
+      config:
+        username: nacos
+        password: nacos
+        context-path: /nacos
+        namespace: public
+        group: DEFAULT_GROUP
+        server-addr: localhost:8848
+        file-extension: yaml
+
+
+
