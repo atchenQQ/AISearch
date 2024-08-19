@@ -60,7 +60,7 @@ AI 项目开发的必要性：人工智能时代，大模型已经是人们不�
   - MyBatisPlus 插件：一键生成 MP 业务代码。
   - MyBatisX 插件：MP 官方插件，mapper 和 xml 关联。
   - RESTFul-Tool 插件：列举所有接口列表，发送 HTTP 请求。
-  - 通义灵码插件：AI 自动生成和补全代码的神奇。
+  - Fitten-Code-Chat：AI 自动生成和补全代码的神奇。
   - Edit Starters：方便添加依赖。
   - Maven Helper：解决 Jar 包冲突。
 - MySQL 8.x
